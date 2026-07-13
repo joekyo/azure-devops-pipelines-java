@@ -25,6 +25,9 @@ stages:
         jdkArchitectureOption: 'x64'
         publishJUnitResults: false
         goals: 'package -DskipTests'
+    - publish: $(System.DefaultWorkingDirectory)/target
+      artifact: buildOutput
+
 - stage: Test
   displayName: 'Test Stage'
   dependsOn: Build
