@@ -23,9 +23,8 @@ stages:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.11'
         jdkArchitectureOption: 'x64'
-        publishJUnitResults: true
-        testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        goals: 'package'
+        publishJUnitResults: false
+        goals: 'package -DskipTests'
 - stage: Test
   displayName: 'Test Stage'
   dependsOn: Build
@@ -34,6 +33,16 @@ stages:
   - job: TestJob
     displayName: 'Test Job'
     steps:
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'test'
     - task: PublishCodeCoverageResults@2
       inputs:
         summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/site/jacoco/jacoco.xml" # Path to summary files
