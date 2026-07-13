@@ -9,19 +9,33 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- task: Maven@4
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
-- task: PublishCodeCoverageResults@2
-  inputs:
-    summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/site/jacoco/jacoco.xml" # Path to summary files
-    reportDirectory: "$(System.DefaultWorkingDirectory)/**/site/jacoco" # Path to report directory
-    failIfCoverageEmpty: true # Fail if code coverage results are missing
+stages:
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build Job'
+    steps:
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'package'
+- stage: Test
+  displayName: 'Test Stage'
+  dependsOn: Build
+  isSkippable: false
+  jobs:
+  - job: TestJob
+    displayName: 'Test Job'
+    steps:
+    - task: PublishCodeCoverageResults@2
+      inputs:
+        summaryFileLocation: "$(System.DefaultWorkingDirectory)/**/site/jacoco/jacoco.xml" # Path to summary files
+        reportDirectory: "$(System.DefaultWorkingDirectory)/**/site/jacoco" # Path to report directory
+        failIfCoverageEmpty: true # Fail if code coverage results are missing
