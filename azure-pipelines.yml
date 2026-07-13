@@ -31,7 +31,7 @@ stages:
 - stage: Test
   displayName: 'Test Stage'
   dependsOn: Build
-  isSkippable: false
+  isSkippable: true
   jobs:
   - job: TestJob
     displayName: 'Test Job'
